@@ -94,7 +94,7 @@ g_filt_t=null, g_play=null, g_res=null,
 g_db=[], g_db_lens=[],
 g_pl=[], g_pl_x=0, g_pl_ipp=1,g_rep=2,
 W=window,
-g_a=null, g_v=0, g_vt=null,
+g_a=null, g_v=0, g_vt=null, g_vt_req=0,
 getE=function(f){return document.getElementById(f)};
 
 function hasS(f, l) {
@@ -256,7 +256,9 @@ function vis() {
 		return ((127*Math.sin(i*0.1)+0x180)|0).toString(16).substr(-2);
 	};
 
-	return function() {
+	var f;
+        f = function() {
+		g_vt_req=0;
 		if (!g_v || !g_a) return;
 
 		var cw = cv.width, ch = cv.height, 
@@ -286,7 +288,9 @@ function vis() {
 		cnt2+=1.05;
 		cnt3+=2.1;
 		cnt4+=0.2;
+		if (!g_vt_req++) window.requestAnimationFrame(f);
 	};
+	return f;
 }
 
 function visb() {
@@ -306,7 +310,8 @@ function visb() {
 		getE("vis").style.display="inline";
 		getE("lib").style.display="none";
 		getE("visb").innerHTML = "lib";
-		if (!g_vt) g_vt=W.setInterval(vis(),50);
+		if (!g_vt) g_vt = vis();
+		if (!g_vt_req++) window.requestAnimationFrame(g_vt);
 	} else {
 		getE("lib").style.display="inline";
 		getE("vis").style.display="none";
