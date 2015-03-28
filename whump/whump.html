@@ -1,0 +1,344 @@
+<html>
+<head>
+<title>
+<WHUMP_TITLE>
+</title>
+<!-- 
+WHUMP v0.13
+Web HTML Universal Music Player 
+Copyright (C) 2015 Cockos Inc
+License: GPL
+
+To use: replace the 4 WHUMP tags (WHUMP_TITLE, WHUMP_HEADER, WHUMP_FOOTER WHUMP_INIT) with better contents
+The WHUMP_INIT tag should include javascript, including one or more: request_db("filename.txt"), the contents of which should be:
+
+Prepopulated playlist item:
+pre	relativeURL 
+
+Item in database:
+item	relativeURL	length_in_seconds
+
+WHUMP_INIT can also override db_fntitle/pl_fntitle, if desired
+
+That is all!
+-->
+
+<style>
+.btn { 
+	font-weight: bold;
+	font-size: 10px;
+	background-color:#077;
+	color:white;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+.tbar {
+	background-color: #aaa;
+	color:#444;
+	font-size:12px;
+}
+#thdr {
+	background-color: black;
+	color: white;
+	text-align: center;
+	padding: 4px;
+}
+#thdr a {
+	color: white;
+}
+#pcont { 
+	background-color: #666;
+	color: white;
+	text-align: center;
+	padding-bottom: 6px;
+	padding-top: 2px;
+}
+#nowp {
+	color: #aaf;
+}
+#lcont {
+	float: left;
+	width: 60%;
+}
+#rcont {
+	float: right;
+	width: 40%;
+	background-color: black;
+	color: white;
+}
+#fbox {
+	font-size: 10px;
+}
+#foot {
+	width: 100%;
+	background-color:#ccc;
+	color: black;
+	text-align: right;
+}
+#res {
+	overflow-y: scroll;
+	height: 85%;
+	background-color:white;
+	color:black;
+}
+#pl {
+	color: white;
+	overflow-y: scroll;
+	height: 85%;
+}
+#pl a {
+	color: #3f3;
+	font-weight: normal;
+}
+</style>
+<script>
+
+// can be overriden in WHUMP_INIT
+var db_fntitle = function(s) {  
+	return s.replace( /(.*)[.][a-zA-Z0-9]+?$/,"$1");
+},
+pl_fntitle = function(s) {
+	return s.replace(/(.*[/])?(.*)[.][a-zA-Z0-9]+?$/, "$2");
+},
+fntourl = function(s) { 
+	return s; 
+},
+g_filt_t=null, g_play=null, g_res=null;
+g_db=[], g_db_lens=[]
+g_pl=[], g_pl_x=0, g_pl_ipp=1,
+W=window,
+getE=function(f){return document.getElementById(f)};
+
+function hasS(f, l) {
+	for (var i in l) if (f.toLowerCase().indexOf(l[i])<0) return 0;
+	return 1;
+}
+
+function pPi(i,f) {
+	g_play.src = fntourl(g_pl[g_pl_x=i]);
+	g_play.load();
+	if (f) g_play.play();
+	updNowp();
+}
+
+function mkDiv(p,t) {
+	var i = document.createElement("div");
+	i.innerHTML = t;
+	p.appendChild(i);
+	return i;
+}
+
+function plUpd() {
+        getE("phn").innerHTML = g_pl_ipp ? "<i> -- pre-populated favorites</i>" : "";
+
+	var i=0, d=getE("pl"), n=d.childNodes, p=n.length, c=g_pl.length;
+	for (;i<c;i++) {
+		var a = g_pl[i], t = (i+1) + ". " +  pl_fntitle(a), url=fntourl(a);
+		if (i>=p) mkDiv(d,"<span class=\"btn\" onClick=\"plRm(" + i + ")\">x</span> " +
+				 "<a href=\"" + url + "\"  onClick=\"return seek(" + i + ")\">" + t + "</a><BR>");
+		else {
+			var v = n[i].childNodes[2];
+			v.href = url;
+			v.innerHTML = t;
+		}
+	}
+	while (p > c) d.removeChild(n[--p]);
+	updNowp();
+}
+
+function updNowp() {
+	getE("nowp").innerHTML = 
+		(g_pl_x >= 0 && g_pl_x < g_pl.length) ?
+		(g_pl_x+1) + ". " + pl_fntitle(g_pl[g_pl_x]) : "ready";
+}
+
+function seek(i) {
+	if (i >= 0 && i < g_pl.length) {
+		if (g_pl_x != i || isStop()) pPi(i,1);
+		else if (g_play.paused) g_play.play();
+	}
+	return false;
+}
+
+function isStop() {
+	return g_play.ended || g_play.error;
+}
+
+function plClr() {
+	g_pl = [];
+	g_pl_x = 0;
+	g_pl_ipp = 0;
+	plUpd();
+	g_play.pause();
+}
+
+function plRm(i) {
+	var x, n = [];
+	for (x in g_pl) if (x != i) n[n.length] = g_pl[x];
+	g_pl = n;
+	if (g_pl_x == i) {
+		if (g_pl_x < g_pl.length) pPi(g_pl_x,1);
+		else g_play.pause();
+	} else {
+		if (g_pl_x > 0 && g_pl_x > i) g_pl_x -= 1;
+	}
+	g_pl_ipp = 0;
+	plUpd();
+}
+
+function nq(idx, fst, up) {
+	if (g_pl_ipp && fst == 1) fst++;
+	g_pl_ipp = 0;
+
+	if (fst>1) { 
+		g_pl=[];
+		g_pl_x=0;
+	}
+	if (idx>=0 && idx < g_db.length) {
+		var i=g_pl.length;
+		g_pl[i] = g_db[idx];
+		if (fst || !i || isStop() || g_play.paused) pPi(i,1);
+  	}
+	if (up) plUpd();
+}
+
+function fmtLen(x) {
+	var s = g_db_lens[x], s2=(s%60);
+	return s > 0 ? (Math.floor(s/60) + ":" + (s2 < 10 ? "0" : "") + s2) : "";
+}
+
+function dbFlt(cb) {
+	var n,x, f = getE("fbox").value.toLowerCase().split(" ");
+	for (x in g_db) {
+                n = db_fntitle(g_db[x]);
+		if (!f.length || hasS(n,f)) cb(n,x);
+	}
+}
+
+function rnMk(x, lb) {
+	return "<span class=\"btn\">play</span> " + "<span class=\"btn\">queue</span> " + "<span>" + lb + "</span>";
+}
+function rnCfg(n, x) {
+	n=n.childNodes;
+	n[0].onclick = function() { nq(x,1,1); };
+	n[2].onclick = n[4].onclick = function() { nq(x,0,1); };
+}
+
+function genRes() {
+	var c=0, n=g_res.childNodes, dl = n.length;
+        dbFlt(function(nm, x) {
+		var lb = nm + " <i>" + fmtLen(x) + "</i>", a, d;
+		if (c < dl) {
+			d = n[c++];
+			a = d.childNodes;
+			if (a.length == 5) a[4].innerHTML = lb;
+			else d.innerHTML=rnMk(x,lb);
+		} else {
+			d = mkDiv(g_res,rnMk(x,lb));
+		}
+		rnCfg(d,x);
+        });
+	while (dl > c) g_res.removeChild(n[--dl]);
+}
+
+function pAll(c) {
+        dbFlt(function(n, x) { nq(x,c++==0,0); });
+	plUpd();
+}
+
+function onF() {
+	if (g_filt_t != null) W.clearTimeout(g_filt_t);
+	g_filt_t = W.setTimeout(function() { g_filt_t = null; genRes() }, 300);
+}
+
+function request_db(list) {
+	var r=0;
+/*@cc_on @*/
+/*@if (@_jscript_version >= 5)
+try { r = new ActiveXObject("Msxml2.XMLHTTP"); } catch (e) { try { r = new ActiveXObject("Microsoft.XMLHTTP"); } catch (E) { r = 0; } }
+@end @*/
+if (!r && typeof XMLHttpRequest!='undefined') { try { r = new XMLHttpRequest(); } catch (e) { r=0; } }
+if (!r && W.createRequest) { try { r = W.createRequest(); } catch (e) { r=0; } }
+
+	if (!r) {
+		g_res.innerHTML = "<div><i>error, no xml http support</i></div>";
+		return;
+	}
+	r.open("GET", list, true);
+	r.onreadystatechange = function() {
+		if (r.readyState == 4) {
+			if (r.status == 200) {
+				impD(r.responseText);
+			} else {
+				g_res.innerHTML = "<div><i>error, got " + r.status + " for " + list + " </i></div>";
+			}
+	
+		}
+	};
+	g_res.innerHTML = "<div><i>fetching list of tracks...</i></div>";
+	r.send(null);
+}
+
+function impD(text) {
+        var x, ol = g_pl.length, ln = text.split("\n");
+	for (x in ln) {
+		var s = ln[x].split("\t");
+		if (s.length >= 2) {
+			if (s[0] == "pre") {
+				if (g_pl_ipp) g_pl[g_pl.length] = s[1];
+			}
+			else if (s[0] == "item") {
+				g_db_lens[g_db.length] = s.length > 2 ? s[2] : 0;
+				g_db[g_db.length] = s[1];
+			}
+		}
+	}
+	if (!ol) {
+		if (g_pl.length > 0) pPi(0,0);
+		else g_pl_ipp=0;
+	}
+	genRes();
+	plUpd();
+
+}
+
+function init() {
+	g_play = getE("pctl");
+	g_res = getE("res");
+
+<WHUMP_INIT>
+
+;	W.setInterval(function() {
+		if (isStop() && g_pl_x < g_pl.length-1) pPi(g_pl_x+1,1);
+	}, 100);
+}
+
+</script>
+</head>
+<body onLoad="init();">
+<div id="thdr">
+<WHUMP_HEADER>
+</div>
+<div id="pcont">
+	<div>
+		<span class="btn" onClick="seek(g_pl_x-1)">&lt;&lt;</span> 
+		<span id="nowp">...</span> 
+		<span class="btn" onClick="seek(g_pl_x+1)">&gt;&gt;</span>
+	</div>
+	<audio controls="controls" id="pctl"></audio>
+</div>
+<div>
+	<div id="lcont">
+		<div class="tbar">search: <input id="fbox" type="text" size=40 onkeyup="onF();"></input> 
+			<span class="btn" onClick="pAll(0)">play all</span>
+			<span class="btn" onClick="pAll(1)">queue all</span>
+		</div>
+		<div id="res"><div><i>initializing...</i></div></div>
+	</div>
+	<div id="rcont"><div class="tbar">playlist: <span class="btn" onClick="plClr()">clear</span><span id="phn"></span></div><div id="pl"></div></div>
+</div>
+<div id="foot">
+<WHUMP_FOOTER>
+</div>
+</body>
+</html>
