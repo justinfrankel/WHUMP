@@ -369,9 +369,13 @@ function impD(text) {
 	plUpd();
 	var q=window.location.hash.replace(/^#pq=(.+)$/,"$1")
 	if (q!="") {
-		getE("fbox").value=decodeURIComponent(q);
-		plClr();
-		pAll(1);
+		if (q == ".") seek(0);
+		else {
+			getE("fbox").value=decodeURIComponent(q);
+			plClr();
+			pAll(1);
+		}
+		visb();
 	}
 }
 
