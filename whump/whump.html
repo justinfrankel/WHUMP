@@ -82,7 +82,7 @@ pl_fntitle = function(s) {
 	return s.replace(/(.*[/])?(.*)[.][a-zA-Z0-9]+?$/, "$2");
 },
 fntourl = function(s) { 
-	return s; 
+	return s.replace(/#/g,"%23");
 },
 g_filt_t=null, g_play=null, g_res=null,
 g_db=[], g_db_lens=[],
