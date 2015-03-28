@@ -4,7 +4,7 @@
 <WHUMP_TITLE>
 </title>
 <!-- 
-WHUMP v0.15
+WHUMP v0.16
 Web HTML Universal Music Player 
 Copyright (C) 2015 Cockos Inc
 License: GPL
@@ -290,6 +290,12 @@ function impD(text) {
 	if (!ol) { g_pl.length > 0 ? pPi(0,0) : g_pl_ipp=0; }
 	genRes();
 	plUpd();
+	var q=window.location.hash.replace(/^#pq=(.+)$/,"$1")
+	if (q!="") {
+		getE("fbox").value=decodeURIComponent(q);
+		plClr();
+		pAll(1);
+	}
 
 }
 
