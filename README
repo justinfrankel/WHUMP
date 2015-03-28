@@ -1,0 +1,28 @@
+WHUMP v0.x
+Web HTML Universal Music Player 
+Copyright (C) 2015 Cockos Inc
+License: GPL
+
+To use: replace the 4 WHUMP tags (WHUMP_TITLE, WHUMP_HEADER, WHUMP_FOOTER WHUMP_INIT) with better contents (can be done manually or via PHP etc)
+
+The WHUMP_INIT tag should include javascript, including one or more: 
+
+request_db("filename.txt")
+
+whereas filename.txt can be a URL, and the contents of which should be zero or more lines of (tab delimited):
+
+  ; Prepopulated playlist item:
+  pre	URL
+
+  ; Item in database:
+  item	URL	length_in_seconds
+
+WHUMP_INIT can also override the following functions:
+
+db_fntitle(), pl_fntitle(), and fntourl()
+
+each of these take the URL from the database line, and return strings for the left (database) pane, the playlist/now playing display, or the HTML5 <audio tag>.
+
+
+That is all!
+
