@@ -154,14 +154,12 @@ function plClr() {
 
 function plSrt(m) {
 	if (g_pl.length>1) {
-		var fn=g_pl[g_pl_x], c=Math.random();
+		var fn=g_pl[g_pl_x],x;
 		if (m==1) g_pl.reverse();
 		else if (m==2) {
-			var n=[],x;
-			for (x in g_pl) n.push([g_pl[x],Math.random()]);
-			n.sort(function(a,b){return a[1]-b[1];});
-			g_pl=[];
-			for (x in n) g_pl.push(n[x][0]);
+			for (x in g_pl) g_pl[x] = [g_pl[x],Math.random()];
+			g_pl.sort(function(a,b){return a[1]-b[1];});
+			for (x in g_pl) g_pl[x] = g_pl[x][0];
 		}
 		else g_pl.sort(function(a,b){
 			return pl_fntitle(a).toLowerCase() > 
