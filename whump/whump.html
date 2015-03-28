@@ -105,7 +105,7 @@ fntourl = function(s) {
 },
 g_filt_t=null, g_play=null, g_res=null;
 g_db=[], g_db_lens=[]
-g_pl=[], g_pl_x=0, g_pl_ipp=1,
+g_pl=[], g_pl_x=0, g_pl_ipp=1,g_rep=2,
 W=window,
 getE=function(f){return document.getElementById(f)};
 
@@ -240,6 +240,11 @@ function pAll(c) {
 	plUpd();
 }
 
+function repcl() {
+	getE("rep").innerHTML = 
+		"repeat " + (["off", "all", "one"])[g_rep = (g_rep+1)%3];
+}
+
 function onF() {
 	if (g_filt_t != null) W.clearTimeout(g_filt_t);
 	g_filt_t = W.setTimeout(function() { g_filt_t = null; genRes() }, 300);
@@ -296,19 +301,22 @@ function impD(text) {
 		plClr();
 		pAll(1);
 	}
-
 }
 
 function init() {
 	g_play = getE("pctl");
 	g_res = getE("res");
+	repcl();
+
 	window.onbeforeunload = function() { 
 		return isStop() || g_play.paused ? null : 'WHUMP playback active'; 
 	};
 
 <WHUMP_INIT>
 
-;	W.setInterval(function() { isStop() && seek(g_pl_x+1); }, 100);
+;	W.setInterval(function() { 
+		isStop() && seek(g_rep == 1 && g_pl_x >= g_pl.length-1 ? 0 : (g_pl_x+(g_rep!=2))); 
+	}, 100);
 }
 
 </script>
@@ -321,6 +329,7 @@ function init() {
 	<div>
 		<span class="btn" onClick="seek(g_pl_x-1)">&lt;&lt;</span> 
 		<span id="nowp">...</span> 
+		<span class="btn" id="rep" onClick="repcl()"></span>
 		<span class="btn" onClick="seek(g_pl_x+1)">&gt;&gt;</span>
 	</div>
 	<audio controls="controls" id="pctl"></audio>
