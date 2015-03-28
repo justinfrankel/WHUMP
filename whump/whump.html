@@ -152,6 +152,27 @@ function plClr() {
 	g_play.pause();
 }
 
+function plSrt(m) {
+	if (g_pl.length>1) {
+		var fn=g_pl[g_pl_x], c=Math.random();
+		if (m==1) g_pl.reverse();
+		else if (m==2) {
+			var n=[],x;
+			for (x in g_pl) n.push([g_pl[x],Math.random()]);
+			n.sort(function(a,b){return a[1]-b[1];});
+			g_pl=[];
+			for (x in n) g_pl.push(n[x][0]);
+		}
+		else g_pl.sort(function(a,b){
+			return pl_fntitle(a).toLowerCase() > 
+				pl_fntitle(b).toLowerCase() ? 1:-1;
+		});
+		g_pl_x=g_pl.indexOf(fn);
+		g_pl_ipp = 0;
+		plUpd();
+	}
+}
+
 function plRm(i) {
 	g_pl.splice(i,1);
 	if (g_pl_x == i) g_pl_x < g_pl.length ? pPi(g_pl_x,1) : g_play.pause();
@@ -320,7 +341,16 @@ function init() {
 		</div>
 		<div id="res"><div><i>initializing...</i></div></div>
 	</div>
-	<div id="rcont"><div class="tbar">playlist: <span class="btn" onClick="plClr()">clear</span><span id="phn"></span></div><div id="pl"></div></div>
+	<div id="rcont">
+		<div class="tbar">playlist: 
+			<span class="btn" onClick="plClr()">clear</span>
+			<span class="btn" onClick="plSrt(0)">sort</span>
+			<span class="btn" onClick="plSrt(1)">reverse</span>
+			<span class="btn" onClick="plSrt(2)">randomize</span>
+			<span id="phn"></span>
+		</div>
+		<div id="pl"></div>
+	</div>
 </div>
 <div id="foot">
 <WHUMP_FOOTER>
