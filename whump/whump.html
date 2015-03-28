@@ -262,14 +262,15 @@ function vis() {
 			ctx = cv.getContext("2d"),  
 			sc=0.01*(1.2+Math.cos(cnt*0.03)) + 0.03,
 			sc2=0.009*Math.cos(cnt3*0.011), sc3=0.004*Math.sin(cnt4*0.133+1.2),
-			xsc = cw / da.length, x;
+			dl = Math.min(da.length,512),
+			xsc = cw / dl, x;
 
 		ctx.strokeStyle="#" + v2h(cnt4) + v2h(cnt2) + v2h(cnt3);
 		ctx.beginPath();
 
 		g_a.getFloatTimeDomainData(da);
-		for (x = 0; x < da.length; x ++) {
-			var y = ch*0.5 * (1.0 + 2.0*da[x]);
+		for (x = 0; x < dl; x ++) {
+			var y = ch*0.5 * (1.0 + da[x]);
 			x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);
 		}
 		ctx.stroke();
@@ -295,6 +296,7 @@ function visb() {
        			var c = new ac;
 			var source = c.createMediaElementSource(g_play);
 			g_a=c.createAnalyser();
+			g_a.fftSize=512;
 			source.connect(g_a);
 			g_a.connect(c.destination);
 		}
