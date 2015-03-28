@@ -71,6 +71,11 @@
 	color: #3f3;
 	font-weight: normal;
 }
+#vis {
+	width: 100%;
+	height: 85%;
+	display:none;
+}
 </style>
 <script>
 
@@ -88,6 +93,7 @@ g_filt_t=null, g_play=null, g_res=null,
 g_db=[], g_db_lens=[],
 g_pl=[], g_pl_x=0, g_pl_ipp=1,g_rep=2,
 W=window,
+g_a=null, g_v=0, g_vt=null,
 getE=function(f){return document.getElementById(f)};
 
 function hasS(f, l) {
@@ -238,6 +244,73 @@ function pAll(c) {
 	plUpd();
 }
 
+function vis() {
+	var cnt=0,cnt2=0,cnt3=0,cnt4=30;
+	var sepcv = document.createElement("canvas");
+	var cv = getE("vis");
+
+	var da = new Float32Array(g_a.fftSize);
+
+	function v2h(i) { 
+		return ((127*Math.sin(i*0.1)+0x180)|0).toString(16).substr(-2);
+	};
+
+	return function() {
+		if (!g_v || !g_a) return;
+
+		var cw = cv.width, ch = cv.height, 
+			ctx = cv.getContext("2d"),  
+			sc=0.01*(1.2+Math.cos(cnt*0.03)) + 0.03,
+			xsc = cw / da.length, x;
+
+		ctx.strokeStyle="#" + v2h(cnt4) + v2h(cnt2) + v2h(cnt3);
+		ctx.beginPath();
+
+		g_a.getFloatTimeDomainData(da);
+		for (x = 0; x < da.length; x ++) {
+			var y = ch*0.5 * (1.0 + 2.0*da[x]);
+			x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);
+		}
+		ctx.stroke();
+
+		sepcv.width = cw;
+		sepcv.height = ch;
+		var ctx2=sepcv.getContext("2d");
+		ctx2.drawImage(cv, cw*sc,ch*sc, cw*(1.0-2*sc),ch*(1.0-2*sc), 0,0,cw,ch);
+		ctx.drawImage(sepcv, 0,0);
+ 
+		cnt+=1+Math.cos(cnt2*0.02)*0.08;
+		cnt2+=1.05;
+		cnt3+=2.1;
+		cnt4+=0.2;
+	};
+}
+
+function visb() {
+	g_v=!g_v;
+	if (g_v && !g_a) {
+		var ac = window.AudioContext || window.webkitAudioContext;
+		if (ac) {
+       			var c = new ac;
+			var source = c.createMediaElementSource(g_play);
+			g_a=c.createAnalyser();
+			source.connect(g_a);
+			g_a.connect(c.destination);
+		}
+	}
+	if (g_v && g_a) {
+		getE("vis").style.display="inline";
+		getE("lib").style.display="none";
+		getE("visb").innerHTML = "lib";
+		if (!g_vt) g_vt=W.setInterval(vis(),50);
+	} else {
+		getE("lib").style.display="inline";
+		getE("vis").style.display="none";
+		getE("visb").innerHTML = "vis";
+	}
+
+}
+
 function repcl() {
 	getE("rep").innerHTML = 
 		"repeat " + (["off", "all", "one"])[g_rep = (g_rep+1)%3];
@@ -328,11 +401,13 @@ function init() {
 		<span class="btn" onClick="seek(g_pl_x-1)">&lt;&lt;</span> 
 		<span id="nowp">...</span> 
 		<span class="btn" id="rep" onClick="repcl()"></span>
+		<span class="btn" id="visb" onClick="visb()">vis</span>
 		<span class="btn" onClick="seek(g_pl_x+1)">&gt;&gt;</span>
 	</div>
 	<audio controls="controls" id="pctl"></audio>
 </div>
-<div>
+<canvas id="vis"></canvas>
+<div id="lib">
 	<div id="lcont">
 		<div class="tbar">search: <input id="fbox" type="text" size=40 onkeyup="onF();"></input> 
 			<span class="btn" onClick="pAll(0)">play all</span>
