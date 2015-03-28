@@ -261,6 +261,7 @@ function vis() {
 		var cw = cv.width, ch = cv.height, 
 			ctx = cv.getContext("2d"),  
 			sc=0.01*(1.2+Math.cos(cnt*0.03)) + 0.03,
+			sc2=0.009*Math.cos(cnt3*0.011), sc3=0.004*Math.sin(cnt4*0.133+1.2),
 			xsc = cw / da.length, x;
 
 		ctx.strokeStyle="#" + v2h(cnt4) + v2h(cnt2) + v2h(cnt3);
@@ -276,7 +277,7 @@ function vis() {
 		sepcv.width = cw;
 		sepcv.height = ch;
 		var ctx2=sepcv.getContext("2d");
-		ctx2.drawImage(cv, cw*sc,ch*sc, cw*(1.0-2*sc),ch*(1.0-2*sc), 0,0,cw,ch);
+		ctx2.drawImage(cv, cw*(sc+sc2),ch*(sc+sc3), cw*(1.0-2*sc),ch*(1.0-2*sc), 0,0,cw,ch);
 		ctx.drawImage(sepcv, 0,0);
  
 		cnt+=1+Math.cos(cnt2*0.02)*0.08;
