@@ -153,10 +153,8 @@ function plClr() {
 }
 
 function plRm(i) {
-	var x,c=0,n = [];
-	for (x in g_pl) if (x != i) n[c++] = g_pl[x];
-	g_pl = n;
-	if (g_pl_x == i) g_pl_x < c ? pPi(g_pl_x,1) : g_play.pause();
+	g_pl.splice(i,1);
+	if (g_pl_x == i) g_pl_x < g_pl.length ? pPi(g_pl_x,1) : g_play.pause();
 	else if (g_pl_x > i) g_pl_x--;
 	g_pl_ipp = 0;
 	plUpd();
