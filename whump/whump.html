@@ -250,7 +250,7 @@ function vis() {
 	var sepcv = document.createElement("canvas");
 	var cv = getE("vis");
 
-	var da = new Float32Array(g_a.fftSize);
+	var da = new Uint8Array(g_a.fftSize);
 
 	function v2h(i) { 
 		return ((127*Math.sin(i*0.1)+0x180)|0).toString(16).substr(-2);
@@ -269,9 +269,9 @@ function vis() {
 		ctx.strokeStyle="#" + v2h(cnt4) + v2h(cnt2) + v2h(cnt3);
 		ctx.beginPath();
 
-		g_a.getFloatTimeDomainData(da);
+		g_a.getByteTimeDomainData(da);
 		for (x = 0; x < dl; x ++) {
-			var y = ch*0.5 * (1.0 + da[x]);
+			var y = ch*0.5 * (1.0 + (da[x]-0x80)*0.0078125);
 			x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);
 		}
 		ctx.stroke();
