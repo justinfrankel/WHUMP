@@ -4,7 +4,7 @@
 <WHUMP_TITLE>
 </title>
 <!-- 
-WHUMP v0.13
+WHUMP v0.15
 Web HTML Universal Music Player 
 Copyright (C) 2015 Cockos Inc
 License: GPL
@@ -117,7 +117,7 @@ function hasS(f, l) {
 function pPi(i,f) {
 	g_play.src = fntourl(g_pl[g_pl_x=i]);
 	g_play.load();
-	if (f) g_play.play();
+	f && g_play.play();
 	updNowp();
 }
 
@@ -173,21 +173,17 @@ function plClr() {
 }
 
 function plRm(i) {
-	var x, n = [];
-	for (x in g_pl) if (x != i) n[n.length] = g_pl[x];
+	var x,c=0,n = [];
+	for (x in g_pl) if (x != i) n[c++] = g_pl[x];
 	g_pl = n;
-	if (g_pl_x == i) {
-		if (g_pl_x < g_pl.length) pPi(g_pl_x,1);
-		else g_play.pause();
-	} else {
-		if (g_pl_x > 0 && g_pl_x > i) g_pl_x -= 1;
-	}
+	if (g_pl_x == i) g_pl_x < c ? pPi(g_pl_x,1) : g_play.pause();
+	else if (g_pl_x > i) g_pl_x--;
 	g_pl_ipp = 0;
 	plUpd();
 }
 
 function nq(idx, fst, up) {
-	if (g_pl_ipp && fst == 1) fst++;
+	g_pl_ipp && fst == 1 && fst++;
 	g_pl_ipp = 0;
 
 	if (fst>1) { 
@@ -199,7 +195,7 @@ function nq(idx, fst, up) {
 		g_pl[i] = g_db[idx];
 		if (fst || !i || isStop() || g_play.paused) pPi(i,1);
   	}
-	if (up) plUpd();
+	up && plUpd();
 }
 
 function fmtLen(x) {
@@ -233,16 +229,14 @@ function genRes() {
 			a = d.childNodes;
 			if (a.length == 5) a[4].innerHTML = lb;
 			else d.innerHTML=rnMk(x,lb);
-		} else {
-			d = mkDiv(g_res,rnMk(x,lb));
-		}
+		} else d = mkDiv(g_res,rnMk(x,lb));
 		rnCfg(d,x);
         });
 	while (dl > c) g_res.removeChild(n[--dl]);
 }
 
 function pAll(c) {
-        dbFlt(function(n, x) { nq(x,c++==0,0); });
+        dbFlt(function(n, x) { nq(x,!c++,0); });
 	plUpd();
 }
 
@@ -293,10 +287,7 @@ function impD(text) {
 			}
 		}
 	}
-	if (!ol) {
-		if (g_pl.length > 0) pPi(0,0);
-		else g_pl_ipp=0;
-	}
+	if (!ol) { g_pl.length > 0 ? pPi(0,0) : g_pl_ipp=0; }
 	genRes();
 	plUpd();
 
@@ -305,12 +296,13 @@ function impD(text) {
 function init() {
 	g_play = getE("pctl");
 	g_res = getE("res");
+	window.onbeforeunload = function() { 
+		return isStop() || g_play.paused ? null : 'WHUMP playback active'; 
+	};
 
 <WHUMP_INIT>
 
-;	W.setInterval(function() {
-		if (isStop() && g_pl_x < g_pl.length-1) pPi(g_pl_x+1,1);
-	}, 100);
+;	W.setInterval(function() { isStop() && seek(g_pl_x+1); }, 100);
 }
 
 </script>
