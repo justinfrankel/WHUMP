@@ -273,7 +273,11 @@ function vis(c,cv) {
 		bb.width = cw;
 		bb.height = ch;
 
-		bb.getContext("2d").drawImage(cv, 
+		var bbc = bb.getContext("2d");
+
+		bbc.imageSmoothingEnabled=false; // keep it classic
+
+		bbc.drawImage(cv, 
 			cw*(sc+sc2),ch*(sc+sc3), 
 			cw*(1.0-2*sc),ch*(1.0-2*sc), 0,0,cw,ch);
 		ctx.drawImage(bb, 0,0);
