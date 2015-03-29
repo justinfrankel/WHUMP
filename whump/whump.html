@@ -245,7 +245,7 @@ function pAll(c) {
 }
 
 function vis(c,cv) {
-	var cnt=0,cnt2=0,cnt3=0,cnt4=30, dl=512,
+	var cnt=0, dl=512,
 		bb = document.createElement("canvas"),
 		da = new Uint8Array(dl),
 		source = c.createMediaElementSource(g_play), 
@@ -266,7 +266,8 @@ function vis(c,cv) {
 		var cw = cv.width, ch = cv.height, 
 			ctx = cv.getContext("2d"),  
 			sc=0.01*(1.2+Math.cos(cnt*0.03)) + 0.03,
-			sc2=0.009*Math.cos(cnt3*0.011), sc3=0.004*Math.sin(cnt4*0.133+1.2),
+			sc2=0.009*Math.cos(cnt*0.011), 
+			sc3=0.004*Math.sin(cnt*0.018+1.2),
 			xsc = cw / dl, x;
 
 		bb.width = cw;
@@ -277,7 +278,7 @@ function vis(c,cv) {
 			cw*(1.0-2*sc),ch*(1.0-2*sc), 0,0,cw,ch);
 		ctx.drawImage(bb, 0,0);
 
-		ctx.strokeStyle="#" + v2h(cnt4) + v2h(cnt2) + v2h(cnt3);
+		ctx.strokeStyle="#" + v2h(cnt) + v2h(cnt*1.3) + v2h(cnt*0.76);
 		ctx.beginPath();
 
 		a.getByteTimeDomainData(da);
@@ -286,12 +287,8 @@ function vis(c,cv) {
 			x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);
 		}
 		ctx.stroke();
-
  
-		cnt+=1+Math.cos(cnt2*0.02)*0.08;
-		cnt2+=1.05;
-		cnt3+=2.1;
-		cnt4+=0.2;
+		cnt++;
 		if (!g_vt_req++) window.requestAnimationFrame(f);
 	}
 	return f;
