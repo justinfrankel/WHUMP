@@ -45,3 +45,26 @@ database-file.txt can be a URL, and the contents of which should be zero or more
 
 
 
+--------
+
+BONUS: want to modify the CSS without having to modify the .html file? Use the following javascript:
+
+function getcssrule(name) {
+	if (!document.styleSheets) return false;
+	var ss=document.styleSheets[0],c=0;
+	for (;;) {
+		for (var i = 0; i < ss.cssRules.length; i ++) {
+			var r = ss.cssRules ? ss.cssRules[i] : ss.rules[i];
+			if (r && r.selectorText.toLowerCase()==name) return r;
+		}
+		if (c++) return false;
+		if (ss.addRule) ss.addRule(name, null,0);
+	        else ss.insertRule(name+" { }", 0);
+	}
+}
+
+Example:
+
+	getcssrule("#foot a").style.color = "black";
+
+
