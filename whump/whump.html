@@ -5,13 +5,25 @@
 </title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 <style>
-.btn { 
+.btn {
 	font-weight: bold;
 	font-size: 10px;
 	background-color:#077;
 	color:white;
 	padding-left: 6px;
 	padding-right: 6px;
+}
+.btb {
+	font-weight: bold;
+	font-size: 16px;
+	background-color:#077;
+	color:white;
+	padding-left: 9px;
+	padding-right: 9px;
+}
+#nowb {
+	padding-bottom:4px;
+	padding-top:4px;
 }
 .tbar {
 	background-color: #aaa;
@@ -33,6 +45,9 @@
 	text-align: center;
 	padding-bottom: 6px;
 	padding-top: 2px;
+}
+#pctl {
+	width: 100%;
 }
 #nowp {
 	color: #aaf;
@@ -411,11 +426,11 @@ function init() {
 </div>
 <div id="pcont">
 	<div id="nowp">...</div> 
-	<div>
-		<span class="btn" onClick="seek(g_pl_x-1)">&lt;&lt;</span> 
-		<span class="btn" id="rep" onClick="repcl()"></span>
-		<span class="btn" id="visb" onClick="visb()">vis</span>
-		<span class="btn" onClick="seek(g_pl_x+1)">&gt;&gt;</span>
+	<div id="nowb">
+		<span class="btb" onClick="seek(g_pl_x-1)">&lt;&lt;</span> 
+		<span class="btb" id="rep" onClick="repcl()"></span>
+		<span class="btb" id="visb" onClick="visb()">vis</span>
+		<span class="btb" onClick="seek(g_pl_x+1)">&gt;&gt;</span>
 	</div>
 	<audio controls="controls" id="pctl"></audio>
 </div>
