@@ -384,7 +384,7 @@ if (!r && W.createRequest) { try { r = W.createRequest(); } catch (e) { r=0; } }
 }
 
 function impD(text) {
-        var x, ol = g_pl.length, ln = text.split("\n");
+        var x, ol = g_pl.length, ln = text.split("\n"), h=window.location.hash;
 	for (x in ln) {
 		var s = ln[x].split("\t");
 		if (s.length >= 2) {
@@ -400,11 +400,10 @@ function impD(text) {
 	if (!ol) { g_pl.length > 0 ? pPi(0,0) : g_pl_ipp=0; }
 	genRes();
 	plUpd();
-	var q=window.location.hash.replace(/^#pq=(.+)$/,"$1")
-	if (q!="") {
-		if (q == ".") seek(0);
+	if ((x=h.replace(/^#pq=(.*)$/,"$1")) != h) {
+		if (x == "") seek(0);
 		else {
-			getE("fbox").value=decodeURIComponent(q);
+			getE("fbox").value=decodeURIComponent(x);
 			plClr();
 			pAll(1);
 		}
