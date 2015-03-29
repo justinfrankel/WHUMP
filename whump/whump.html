@@ -284,7 +284,7 @@ function vis(c,cv) {
 			sc=0.01*(1.2+Math.cos(cnt*0.03)) + 0.03,
 			sc2=0.009*Math.cos(cnt*0.011), 
 			sc3=0.004*Math.sin(cnt*0.018+1.2),
-			xsc = cw / dl, x;
+			xsc = cw / dl, x, yo = Math.sin(cnt*0.001)*ch*0.08;
 
 		bb.width = cw;
 		bb.height = ch;
@@ -304,7 +304,7 @@ function vis(c,cv) {
 
 		a.getByteTimeDomainData(da);
 		for (x = 0; x < dl; x ++) {
-			var y = ch*0.5 * (1.0 + (da[x]-0x80)*0.0078125);
+			var y = ch*0.5 * (1.0 + (da[x]-0x80)*0.0078125) + yo;
 			x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);
 		}
 		ctx.stroke();
