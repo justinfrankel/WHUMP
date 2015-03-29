@@ -93,7 +93,7 @@ g_filt_t=null, g_play=null, g_res=null,
 g_db=[], g_db_lens=[],
 g_pl=[], g_pl_x=0, g_pl_ipp=1,g_rep=2,
 W=window,
-g_v=0, g_vt=null, g_vt_req=0,
+g_v=0, g_vt=null, g_vt_req=0,g_vm=0,
 getE=function(f){return document.getElementById(f)};
 
 function hasS(f, l) {
@@ -275,7 +275,8 @@ function vis(c,cv) {
 
 		var bbc = bb.getContext("2d");
 
-		bbc.imageSmoothingEnabled=false; // keep it classic
+		if (g_vm&2) sc-=0.06;
+		bbc.imageSmoothingEnabled=!(g_vm&1);
 
 		bbc.drawImage(cv, 
 			cw*(sc+sc2),ch*(sc+sc3), 
@@ -418,7 +419,7 @@ function init() {
 	</div>
 	<audio controls="controls" id="pctl"></audio>
 </div>
-<canvas id="vis"></canvas>
+<canvas id="vis" onClick="g_vm++"></canvas>
 <div id="lib">
 	<div id="lcont">
 		<div class="tbar">search: <input id="fbox" type="text" size=40 onkeyup="onF();"/>
