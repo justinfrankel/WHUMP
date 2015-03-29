@@ -3,13 +3,39 @@ Web HTML Universal Music Player
 Copyright (C) 2015 Cockos Inc
 License: GPL
 
-To use: replace the 4 WHUMP tags (WHUMP_TITLE, WHUMP_HEADER, WHUMP_FOOTER WHUMP_INIT) with better contents (can be done manually or via PHP etc)
+To use, option 1:
 
-The WHUMP_INIT tag should include javascript, including one or more: 
+Make a file whump_config.js and put it with whump.html:
 
-request_db("filename.txt")
+	// can override pl_fntitle, db_fntitle, or fntourl() definitions
 
-whereas filename.txt can be a URL, and the contents of which should be zero or more lines of (tab delimited):
+	function whump_init() {
+		document.title = "test";
+		document.getElementById("thdr").innerHTML = "WHUMP-test";
+		document.getElementById("foot").innerHTML = "Powered by WHUMP";
+		request_db("database-file.txt"); // can include multiple lines of these if you like
+	};
+
+
+To use, option 2:
+
+(if you want search-engines getting your page and don't want the additional javascript file)
+
+Search and replace, e.g. in PHP:
+
+	$init_code = 'request_db("database-file.txt");' // can include multiple statements
+
+	echo str_replace('<title>WHUMP</title>','<title>test</title>',
+		str_replace('<div id="thdr"></div>', '<div id="thdr">WHUMP-test</div>',
+		str_replace('<script src="whump_config.js"></script>','',
+		str_replace('<div id="foot"></div>', '<div id="foot">Powered by WHUMP</div>', 
+		str_replace('whump_init();', $init_code,
+		file_get_contents("whump.html"))))));
+
+
+--------
+
+database-file.txt can be a URL, and the contents of which should be zero or more lines of (tab delimited):
 
   ; Prepopulated playlist item:
   pre	URL
@@ -17,12 +43,5 @@ whereas filename.txt can be a URL, and the contents of which should be zero or m
   ; Item in database:
   item	URL	length_in_seconds
 
-WHUMP_INIT can also override the following functions:
 
-db_fntitle(), pl_fntitle(), and fntourl()
-
-each of these take the URL from the database line, and return strings for the left (database) pane, the playlist/now playing display, or the HTML5 <audio tag>.
-
-
-That is all!
 

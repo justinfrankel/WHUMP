@@ -1,8 +1,6 @@
 <html>
 <head>
-<title>
-<WHUMP_TITLE>
-</title>
+<title>WHUMP</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 <style>
 .btn {
@@ -97,7 +95,7 @@
 </style>
 <script>
 
-// can be overriden in WHUMP_INIT
+// can be overriden
 var db_fntitle = function(s) {  
 	return s.replace( /(.*)[.][a-zA-Z0-9]+?$/,"$1");
 },
@@ -414,19 +412,18 @@ function init() {
 		return isStop() || g_play.paused ? null : 'WHUMP playback active'; 
 	};
 
-<WHUMP_INIT>
-
-;	W.setInterval(function() { 
+	W.setInterval(function() { 
 		isStop() && seek(g_rep == 1 && g_pl_x >= g_pl.length-1 ? 0 : (g_pl_x+(g_rep!=2))); 
 	}, 100);
+
+	whump_init();
 }
 
 </script>
+<script src="whump_config.js"></script>
 </head>
 <body onLoad="init();">
-<div id="thdr">
-<WHUMP_HEADER>
-</div>
+<div id="thdr"></div>
 <div id="pcont">
 	<div id="nowp">...</div> 
 	<div id="nowb">
@@ -457,8 +454,6 @@ function init() {
 		<div id="pl"></div>
 	</div>
 </div>
-<div id="foot">
-<WHUMP_FOOTER>
-</div>
+<div id="foot"></div>
 </body>
 </html>
