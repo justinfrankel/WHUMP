@@ -114,11 +114,12 @@ pl_fntitle = function(s) {
 fntourl = function(s) { 
 	return s.replace(/#/g,"%23");
 },
+g_ls_pre="l_",
 g_filt_t=null, g_play=null, g_res=null,
 g_db=[], g_db_lens=[],
 g_pl=[], g_pl_x=0, g_pl_ipp=1,g_rep=2,
 W=window,
-g_v=0, g_vt=null, g_vt_req=0,g_vm=0,
+g_v=0, g_vt=null, g_vt_req=0,g_vm=0,g_pln="",
 getE=function(f){return document.getElementById(f)};
 
 function hasS(f, l) {
@@ -182,6 +183,30 @@ function plClr() {
 	g_pl_ipp = 0;
 	plUpd();
 	g_play.pause();
+}
+
+function plSave() {
+	var x,v = window.prompt("Save playlist?",g_pln), ls=window.localStorage;
+	if (v==null) return;
+	if (!g_pl.length) ls.removeItem(g_ls_pre+v);
+	else ls.setItem(g_ls_pre+v,g_pl.join("\t"));
+	g_pln=v;
+}
+function plLoad() {
+	var p = "Load playlist? Available playlists:\n", x,ls=window.localStorage, n;
+	for (x=0;x<ls.length;x++) {
+		n = ls.key(x);
+		if (n.substring(0,g_ls_pre.length) == g_ls_pre) p += "\t" + n.substring(g_ls_pre.length) + "\n";
+	}
+	p = window.prompt(p,g_pln);
+	if (p==null) return;
+	g_pln = p;
+	p = ls.getItem(g_ls_pre + p);
+	plClr();
+	if (p!=null && p!="") {
+		g_pl = p.split("\t");
+		plUpd();
+	}
 }
 
 function plSrt(m) {
@@ -457,6 +482,8 @@ function init() {
 			<span class="btn" onClick="plSrt(0)">sort</span>
 			<span class="btn" onClick="plSrt(1)">reverse</span>
 			<span class="btn" onClick="plSrt(2)">randomize</span>
+			<span class="btn" onClick="plSave()">save</span>
+			<span class="btn" onClick="plLoad()">load</span>
 			<span id="phn"></span>
 		</div>
 		<div id="pl"></div>
