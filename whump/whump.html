@@ -123,8 +123,20 @@ g_v=0, g_vt=null, g_vt_req=0,g_vm=0,g_pln="",
 getE=function(f){return document.getElementById(f)};
 
 function hasS(f, l) {
-	for (var i in l) if (f.toLowerCase().indexOf(l[i])<0) return 0;
-	return 1;
+	var m=0,t=!1, n=l.length,i=0,s;
+	while (i < n) {
+		s=l[i++];
+		if (s=="not") t=!t;
+		else if (s=="or") { if (m) break; }
+		else {
+			if (s.length>0 && !(m = (f.indexOf(s)<0) == t)) for (;;) {
+				if (i>n-2) return 0;
+				if (l[i++] == "or") break;
+			}
+			t=!1;
+		}
+	}
+	return m;
 }
 
 function pPi(i,f) {
@@ -258,10 +270,10 @@ function fmtLen(x) {
 }
 
 function dbFlt(cb) {
-	var n,x, f = getE("fbox").value.toLowerCase().split(" ");
+	var n,x, s=getE("fbox").value.toLowerCase(), f=s.split(" ");
 	for (x in g_db) {
                 n = db_fntitle(g_db[x]);
-		if (!f.length || hasS(n,f)) cb(n,x);
+		if (s=="" || hasS(n.toLowerCase(),f)) cb(n,x);
 	}
 }
 
