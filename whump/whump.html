@@ -273,6 +273,7 @@ function mkt(r) {
 			o[x-1] += " " + (t ? v : v.substring(0,l));
 		} else if (l) {
 			if (v[0] == '"' || v[0] == '\'') t=v[0];
+			if (t && --l && v[l] == t) v=v.substring(0,l);
 			o[x++]=t ? v.substring(1) : v;
 		}
 	}
