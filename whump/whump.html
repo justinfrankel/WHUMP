@@ -157,11 +157,11 @@ function plUpd() {
 
 	var i=0, d=getE("pl"), n=d.childNodes, p=n.length, c=g_pl.length;
 	for (;i<c;i++) {
-		var a = g_pl[i], t = (i+1) + ". " +  pl_fntitle(a), url=fntourl(a);
-		if (i>=p) mkDiv(d,"<span class=\"btn\" onClick=\"plRm(" + i + ")\">x</span> " +
-				 "<a href=\"" + url + "\"  onClick=\"return seek(" + i + ")\">" + t + "</a><BR>");
+		var a = g_pl[i], t = (i+1) + ". " +  pl_fntitle(a), url=fntourl(a),v;
+		if (i>=p) mkDiv(d,'<span class="btn" onClick="plRm(' + i + ')">x</span> ' +
+				  '<a href="' + url + '"  onClick="return seek(' + i + ')">' + t + '</a><BR>');
 		else {
-			var v = n[i].childNodes[2];
+			v = n[i].childNodes[2];
 			v.href = url;
 			v.innerHTML = t;
 		}
@@ -272,7 +272,7 @@ function mkt(r) {
 			if (l-- && v[l] == t) t=0;
 			o[x-1] += " " + (t ? v : v.substring(0,l));
 		} else if (l) {
-			if (v[0] == '"' || v[0] == '\'') t=v[0];
+			if (v[0] == '"' || v[0] == "'") t=v[0];
 			if (t && --l && v[l] == t) v=v.substring(0,l);
 			o[x++]=t ? v.substring(1) : v;
 		}
@@ -289,7 +289,7 @@ function dbFlt(cb) {
 }
 
 function rnMk(x, lb) {
-	return "<span class=\"btn\">play</span> " + "<span class=\"btn\">queue</span> " + "<span>" + lb + "</span>";
+	return '<span class="btn">play</span> ' + '<span class="btn">queue</span> ' + "<span>" + lb + "</span>";
 }
 function rnCfg(n, x) {
 	n=n.childNodes;
