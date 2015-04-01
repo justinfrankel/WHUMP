@@ -125,11 +125,10 @@ getE=function(f){return document.getElementById(f)};
 function hasS(f, l) {
 	var m=0,t=!1, n=l.length,i=0,s;
 	while (i < n) {
-		s=l[i++];
-		if (s=="not") t=!t;
+		if ((s=l[i++])=="not") t=!t;
 		else if (s=="or") { if (m) break; }
 		else {
-			if (s.length>0 && !(m = (f.indexOf(s)<0) == t)) for (;;) {
+			if (!(m = (f.indexOf(s)<0) == t)) for (;;) {
 				if (i>n-2) return 0;
 				if (l[i++] == "or") break;
 			}
@@ -198,20 +197,17 @@ function plClr() {
 }
 
 function plSave() {
-	var x,v = window.prompt("Save playlist?",g_pln), ls=window.localStorage;
-	if (v==null) return;
-	if (!g_pl.length) ls.removeItem(g_ls_pre+v);
-	else ls.setItem(g_ls_pre+v,g_pl.join("\t"));
-	g_pln=v;
+	var v = window.prompt("Save playlist?",g_pln), ls=window.localStorage;
+	if (v!=null) {
+		if (g_pl.length) ls.setItem(g_ls_pre+v,g_pl.join("\t"));
+		else ls.removeItem(g_ls_pre+v);
+		g_pln=v;
+	}
 }
 function plLoad() {
-	var p = "Load playlist? Available playlists:\n", x,ls=window.localStorage, n;
-	for (x=0;x<ls.length;x++) {
-		n = ls.key(x);
-		if (n.substring(0,g_ls_pre.length) == g_ls_pre) p += "\t" + n.substring(g_ls_pre.length) + "\n";
-	}
-	p = window.prompt(p,g_pln);
-	if (p==null) return;
+	var p = "Load playlist? Available playlists:", x=0,ls=window.localStorage, n, pl=g_ls_pre.length;
+	while (x<ls.length) if ((n=ls.key(x++)).substring(0,pl) == g_ls_pre) p += "\n\t" + n.substring(pl);
+	if ((p = window.prompt(p,g_pln)) == null) return;
 	g_pln = p;
 	p = ls.getItem(g_ls_pre + p);
 	plClr();
@@ -222,22 +218,21 @@ function plLoad() {
 }
 
 function plSrt(m) {
-	if (g_pl.length>1) {
-		var fn=g_pl[g_pl_x],x;
-		if (m==1) g_pl.reverse();
-		else if (m==2) {
-			for (x in g_pl) g_pl[x] = [g_pl[x],Math.random()];
-			g_pl.sort(function(a,b){return a[1]-b[1];});
-			for (x in g_pl) g_pl[x] = g_pl[x][0];
-		}
-		else g_pl.sort(function(a,b){
-			return pl_fntitle(a).toLowerCase() > 
-				pl_fntitle(b).toLowerCase() ? 1:-1;
-		});
-		g_pl_x=g_pl.indexOf(fn);
-		g_pl_ipp = 0;
-		plUpd();
+	if (g_pl.length<1) return;
+	var fn=g_pl[g_pl_x],x;
+	if (m==1) g_pl.reverse();
+	else if (m==2) {
+		for (x in g_pl) g_pl[x] = [g_pl[x],Math.random()];
+		g_pl.sort(function(a,b){return a[1]-b[1];});
+		for (x in g_pl) g_pl[x] = g_pl[x][0];
 	}
+	else g_pl.sort(function(a,b){
+		return pl_fntitle(a).toLowerCase() > 
+			pl_fntitle(b).toLowerCase() ? 1:-1;
+	});
+	g_pl_x=g_pl.indexOf(fn);
+	g_pl_ipp = 0;
+	plUpd();
 }
 
 function plRm(i) {
@@ -270,24 +265,22 @@ function fmtLen(x) {
 }
 
 function mkt(r) {
-	var o=[], t=0,v,vl,i;
+	var o=[], t=0,v,l,i,x=0;
 	for (i in r) {
-		vl = (v = r[i]).length;
-		if (!t) {
-			if (vl) {
-				if (v[0] == '"' || v[0] == '\'') t=v[0];
-				o.push(t ? v.substring(1) : v);
-			}
-		} else {
-			if (vl && v[vl-1] == t) t=0;
-			o[o.length-1] += " " + (t ? v : v.substring(0,vl-1));
+		l = (v = r[i]).length;
+		if (t) {
+			if (l-- && v[l] == t) t=0;
+			o[x-1] += " " + (t ? v : v.substring(0,l));
+		} else if (l) {
+			if (v[0] == '"' || v[0] == '\'') t=v[0];
+			o[x++]=t ? v.substring(1) : v;
 		}
 	}
 	return o;
 }
 
 function dbFlt(cb) {
-	var n,x, s=getE("fbox").value.toLowerCase(), f=mkt(s.split(" "));
+	var n,x, f=mkt(getE("fbox").value.toLowerCase().split(" "));
 	for (x in g_db) {
                 n = db_fntitle(g_db[x]);
 		if (!f.length || hasS(n.toLowerCase(),f)) cb(n,x);
