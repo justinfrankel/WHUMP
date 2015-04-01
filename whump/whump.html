@@ -205,7 +205,7 @@ function plSrt(m) {
 
 function plRm(i) {
 	g_pl.splice(i,1);
-	if (g_pl_x == i) g_pl_x < g_pl.length ? pPi(g_pl_x,1) : g_play.pause();
+	if (g_pl_x == i) g_pl_x < g_pl.length ? pPi(g_pl_x,!isStop() && !g_play.paused) : g_play.pause();
 	else if (g_pl_x > i) g_pl_x--;
 	g_pl_ipp = 0;
 	plUpd();
