@@ -269,11 +269,28 @@ function fmtLen(x) {
 	return s > 0 ? (Math.floor(s/60) + ":" + (s2 < 10 ? "0" : "") + s2) : "";
 }
 
+function mkt(r) {
+	var o=[], t=0,v,vl,i;
+	for (i in r) {
+		vl = (v = r[i]).length;
+		if (!t) {
+			if (vl) {
+				if (v[0] == '"' || v[0] == '\'') t=v[0];
+				o.push(t ? v.substring(1) : v);
+			}
+		} else {
+			if (vl && v[vl-1] == t) t=0;
+			o[o.length-1] += " " + (t ? v : v.substring(0,vl-1));
+		}
+	}
+	return o;
+}
+
 function dbFlt(cb) {
-	var n,x, s=getE("fbox").value.toLowerCase(), f=s.split(" ");
+	var n,x, s=getE("fbox").value.toLowerCase(), f=mkt(s.split(" "));
 	for (x in g_db) {
                 n = db_fntitle(g_db[x]);
-		if (s=="" || hasS(n.toLowerCase(),f)) cb(n,x);
+		if (!f.length || hasS(n.toLowerCase(),f)) cb(n,x);
 	}
 }
 
