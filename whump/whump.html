@@ -333,24 +333,24 @@ function vis(c,cv) {
 		g_vt_req=0;
 		if (!g_v || !a) return;
 
-		var cw = cv.width, ch = cv.height, 
+		var cw = cv.width, ch = cv.height, bbc, s2,
 			ctx = cv.getContext("2d"),  
 			sc=0.01*(1.2+Math.cos(cnt*0.03)) + 0.03,
-			sc2=0.009*Math.cos(cnt*0.011), 
-			sc3=0.004*Math.sin(cnt*0.018+1.2),
 			xsc = cw / dl, x, yo = Math.sin(cnt*0.001)*ch*0.08;
 
 		bb.width = cw;
 		bb.height = ch;
 
-		var bbc = bb.getContext("2d");
+		bbc = bb.getContext("2d");
 
 		if (g_vm&2) sc-=0.06;
 		bbc.imageSmoothingEnabled=!(g_vm&1);
 
+		s2=1.0-2*sc;
 		bbc.drawImage(cv, 
-			cw*(sc+sc2),ch*(sc+sc3), 
-			cw*(1.0-2*sc),ch*(1.0-2*sc), 0,0,cw,ch);
+			cw*(sc+0.009*Math.cos(cnt*0.011)),
+			ch*(sc+0.004*Math.sin(cnt*0.018+1.2)), 
+			cw*s2,ch*s2, 0,0,cw,ch);
 		ctx.drawImage(bb, 0,0);
 
 		ctx.strokeStyle="#" + v2h(cnt) + v2h(cnt*1.3) + v2h(cnt*0.76);
