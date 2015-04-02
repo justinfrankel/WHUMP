@@ -113,10 +113,11 @@ g_ls_pre="l_",
 g_pl_ipp=" - default playlist",
 
 W=window,
-g_filt_t=null, g_play=null, g_res=null,
+Z=null,
+g_filt_t=Z, g_play=Z, g_res=Z,
 g_db=[], g_db_lens=[],
 g_pl=[], g_pl_x=0, g_rep=2,
-g_v=0, g_vt=null, g_vt_req=0,g_vm=0,g_pln="",
+g_v=0, g_vt=Z, g_vt_req=0,g_vm=0,g_pln="",
 getE=function(f){return document.getElementById(f)};
 
 function hasS(f, l) {
@@ -195,7 +196,7 @@ function plClr() {
 
 function plSave() {
 	var v = window.prompt("Save playlist?",g_pln), ls=window.localStorage;
-	if (v!=null) {
+	if (v!==Z) {
 		if (g_pl.length) ls.setItem(g_ls_pre+v,g_pl.join("\t"));
 		else ls.removeItem(g_ls_pre+v);
 		g_pln=v;
@@ -204,11 +205,11 @@ function plSave() {
 function plLoad() {
 	var p = "Load playlist? Available playlists:", x=0,ls=window.localStorage, n, pl=g_ls_pre.length;
 	while (x<ls.length) if ((n=ls.key(x++)).substring(0,pl) == g_ls_pre) p += "\n\t" + n.substring(pl);
-	if ((p = window.prompt(p,g_pln)) == null) return;
+	if ((p = window.prompt(p,g_pln)) === Z) return;
 	g_pln = p;
 	p = ls.getItem(g_ls_pre + p);
 	plClr();
-	if (p!=null && p!="") {
+	if (p!==Z && p!="") {
 		g_pl = p.split("\t");
 		plUpd();
 	}
@@ -277,8 +278,8 @@ function mkt(r) {
 	return o;
 }
 
-function dbFlt(cb) {
-	var n,x, f=mkt(getE("fbox").value.toLowerCase().split(" "));
+function dbFlt(cb,q) {
+	var n,x, f=mkt((q===Z?getE("fbox").value:q).toLowerCase().split(" "));
 	for (x in g_db) {
                 n = db_fntitle(g_db[x]);
 		if (!f.length || hasS(n.toLowerCase(),f)) cb(n,x);
@@ -305,12 +306,12 @@ function genRes() {
 			else d.innerHTML=rnMk(x,lb);
 		} else d = mkDiv(g_res,rnMk(x,lb));
 		rnCfg(d,x);
-        });
+        },Z);
 	while (dl > c) g_res.removeChild(n[--dl]);
 }
 
-function pAll(c) {
-        dbFlt(function(n, x) { nq(x,!c++,0); });
+function pAll(c,q) {
+        dbFlt(function(n, x) { nq(x,!c++,0); },q);
 	plUpd();
 }
 
@@ -396,8 +397,8 @@ function repcl() {
 }
 
 function onF() {
-	if (g_filt_t != null) W.clearTimeout(g_filt_t);
-	g_filt_t = W.setTimeout(function() { g_filt_t = null; genRes() }, 300);
+	if (g_filt_t !== Z) W.clearTimeout(g_filt_t);
+	g_filt_t = W.setTimeout(function() { g_filt_t = Z; genRes() }, 300);
 }
 
 function request_db(list) {
@@ -425,7 +426,7 @@ if (!r && W.createRequest) { try { r = W.createRequest(); } catch (e) { r=0; } }
 		}
 	};
 	g_res.innerHTML = "<div><i>fetching list of tracks...</i></div>";
-	r.send(null);
+	r.send(Z);
 }
 
 function impD(text) {
@@ -448,11 +449,8 @@ function impD(text) {
 	if ((x=h.replace(/^#pq=(.*)$/,"$1")) != h) {
 		if (x == "") seek(0);
 		else {
-			s=getE("fbox");
 			plClr();
-			s.value=decodeURIComponent(x);
-			pAll(1);
-			s.value="";
+			pAll(1,decodeURIComponent(x));
 		}
 		visb();
 	}
@@ -464,7 +462,7 @@ function init() {
 	repcl();
 
 	window.onbeforeunload = function() { 
-		return isStop() || g_play.paused ? null : 'WHUMP playback active'; 
+		return isStop() || g_play.paused ? Z : 'WHUMP playback active'; 
 	};
 
 	W.setInterval(function() { 
@@ -493,8 +491,8 @@ function init() {
 <div id="lib">
 	<div id="lcont">
 		<div class="tbar">search: <input id="fbox" type="text" size=40 onkeyup="onF();"/>
-			<span class="btn" onClick="pAll(0)">play all</span>
-			<span class="btn" onClick="pAll(1)">queue all</span>
+			<span class="btn" onClick="pAll(0,Z)">play all</span>
+			<span class="btn" onClick="pAll(1,Z)">queue all</span>
 		</div>
 		<div id="res"><div><i>initializing...</i></div></div>
 	</div>
