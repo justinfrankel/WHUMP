@@ -144,7 +144,7 @@ Z=null,
 g_filt_t=Z, g_play=Z, g_res=Z,
 g_db=[], g_db_lens=[],
 g_pl=[], g_pl_x=0, g_rep=2,
-g_v=Z, g_va=Z,
+g_v=Z, g_va=Z, g_vn="",
 g_pln="",
 getE=function(f){return document.getElementById(f)};
 
@@ -221,20 +221,42 @@ function plClr() {
 	g_play.pause();
 }
 
-function plSave() {
-	var v = window.prompt("Save playlist?",g_pln), ls=window.localStorage;
-	if (v!==Z) {
-		if (g_pl.length) ls.setItem(g_ls_pre+v,g_pl.join("\t"));
-		else ls.removeItem(g_ls_pre+v);
-		g_pln=v;
+function lSave(t,p,w,d) {
+	var v = window.prompt(t,d), ls=window.localStorage;
+	if (v===Z) return d;
+	w!==Z ? ls.setItem(p+v,w) : ls.removeItem(p+v);
+	return v;
+}
+
+function lLoad(t,p,d) {
+	var v = "Load "+t+"? Available "+t+"s:", x=0,ls=window.localStorage, n, pl=p.length;
+	while (x<ls.length) if ((n=ls.key(x++)).substring(0,pl) == p) v += "\n\t" + n.substring(pl);
+	return window.prompt(v,d);
+}
+
+function vSave() {
+	g_vn=lSave("Save vis preset?","vp_",g_viscode,g_vn);
+}
+function vLoad() {
+	var p = lLoad("vis preset","vp_",g_vn);
+	if (p === Z) return;
+	g_vn=p;
+	p = window.localStorage.getItem("vp_" + p);
+	if (p!==Z && p !="") {
+		vRc(p);
+		getE('visedit').value=p;
 	}
 }
+
+function plSave() {
+	g_pln = lSave("Save playlist?",g_ls_pre,g_pl.length ? g_pl.join("\t"):Z,g_pln);
+}
 function plLoad() {
-	var p = "Load playlist? Available playlists:", x=0,ls=window.localStorage, n, pl=g_ls_pre.length;
-	while (x<ls.length) if ((n=ls.key(x++)).substring(0,pl) == g_ls_pre) p += "\n\t" + n.substring(pl);
-	if ((p = window.prompt(p,g_pln)) === Z) return;
+	var p = lLoad("playlist",g_ls_pre,g_pln);
+	if (p === Z) return;
+
 	g_pln = p;
-	p = ls.getItem(g_ls_pre + p);
+	p = window.localStorage.getItem(g_ls_pre + p);
 	plClr();
 	if (p!==Z && p!="") {
 		g_pl = p.split("\t");
@@ -378,10 +400,9 @@ function visb() {
 	getE("visrc").style.display="none";
 }
 
-function visrc() {
-	var ve=getE("visedit");
+function vRc(a) { 
 	var o=g_v;
-	g_v=(new Function("a","v",g_viscode = ve.value))(g_va,getE("vis"));
+	g_v=(new Function("a","v",g_viscode = a))(g_va,getE("vis"));
 	if (!o) rv();
 }
 
@@ -493,7 +514,14 @@ function init() {
 	<audio controls="controls" id="pctl"></audio>
 </div>
 <canvas id="vis" onClick="g_v['c']();"></canvas>
-<span style="display:none;" id="visupd"><span id="vissc" class="btn" onclick="visedit()"></span><span id="visrc" class="btn" onclick="visrc()">save code</span></span>
+<span style="display:none;" id="visupd">
+	<span id="vissc" class="btn" onclick="visedit()"></span>
+	<span id="visrc">
+		<span class="btn" onclick="vRc(getE('visedit').value);">save code</span>
+		<span class="btn" onclick="vSave()">save preset</span>
+	</span>
+	<span class="btn" onclick="vLoad()">load preset</span>
+</span>
 <textarea id="visedit"></textarea>
 <div id="lib">
 	<div id="lcont">
