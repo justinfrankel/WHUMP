@@ -101,6 +101,14 @@
 	height: 85%;
 	display:none;
 }
+#visedit {
+	display:none;
+	position:absolute;
+	left:0px;
+	top:0px;
+	width: 20%;
+	height:20%;
+}
 </style>
 <script>
 "use strict";
@@ -112,24 +120,24 @@ fntourl = function(s) { return s.replace(/#/g,"%23"); },
 g_ls_pre="l_",
 g_pl_ipp=" - default playlist",
 g_viscode = 
-'var dl = 1024, b = new Uint8Array(dl);'+
-'a.fftSize=dl;'+
-'return { f: function() {' +
-'	var xsc=v.width/dl, ch=v.height,x,ctx=v.getContext("2d");'+
-'	ctx.fillStyle="#000";'+
-'	ctx.globalAlpha=0.25;'+
-'	ctx.fillRect(0,0,v.width,v.height);'+
-'	ctx.strokeStyle="#8f8";'+
-'	ctx.globalAlpha=1;'+
-'	ctx.beginPath();'+
-'	a.getByteTimeDomainData(b);'+
-'	for (x = 0; x < dl; x ++) {'+
-'		var y = ch*0.5 * (1.0 + (b[x]-0x80)*0.0078125);'+
-'		x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);'+
-'	}'+
-'	ctx.stroke();'+
-'}, c: function() { /*onclick*/ }, '+
-'}',
+'var dl = 1024, b = new Uint8Array(dl);\n'+
+'a.fftSize=dl;\n'+
+'return { f: function() {\n' +
+'	var xsc=v.width/dl, ch=v.height,x,ctx=v.getContext("2d");\n'+
+'	ctx.fillStyle="#000";\n'+
+'	ctx.globalAlpha=0.25;\n'+
+'	ctx.fillRect(0,0,v.width,v.height);\n'+
+'	ctx.strokeStyle="#8f8";\n'+
+'	ctx.globalAlpha=1;\n'+
+'	ctx.beginPath();\n'+
+'	a.getByteTimeDomainData(b);\n'+
+'	for (x = 0; x < dl; x ++) {\n'+
+'		var y = ch*0.5 * (1.0 + (b[x]-0x80)*0.0078125);\n'+
+'		x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);\n'+
+'	}\n'+
+'	ctx.stroke();\n'+
+'}, c: function() { /*onclick*/ }, \n'+
+'}\n',
 
 W=window,
 Z=null,
@@ -342,6 +350,7 @@ function rv() {
 }
 
 function visb() {
+	var vu=getE("visupd"), ve=getE("visedit"),v=getE("vis"),l=getE("lib"),vb=getE("visb");
 	if (!g_va) {
 		var ac = window.AudioContext || window.webkitAudioContext;
 		if (ac) {
@@ -352,19 +361,39 @@ function visb() {
 		}
 	}
 	if (g_v) {
-		getE("lib").style.display="inline";
-		getE("vis").style.display="none";
-		getE("visb").innerHTML = "vis";
+		vb.innerHTML = "vis";
+		lib.style.display="inline";
+		v.style.display=ve.style.display= vu.style.display="none";
 		g_v=Z;
 	} else {
 		g_v=(new Function("a","v",g_viscode))(g_va,getE("vis"));
 		if (g_v) {
-			getE("vis").style.display="inline";
-			getE("lib").style.display="none";
-			getE("visb").innerHTML = "lib";
-			rv();
+			vb.innerHTML = "lib";
+			v.style.display=vu.style.display="inline";
+			lib.style.display="none";
+			getE("vissc").innerHTML = "show code";
 		} 
+		rv();
 	}
+	getE("visrc").style.display="none";
+}
+
+function visrc() {
+	var ve=getE("visedit");
+	var o=g_v;
+	g_v=(new Function("a","v",g_viscode = ve.value))(g_va,getE("vis"));
+	if (!o) rv();
+}
+
+function visedit() {
+	var ve=getE("visedit"), f="none",l="show code";
+	if (ve.style.display != "inline") {
+		f="inline";
+		l="hide code";
+		ve.value = g_viscode;
+	}
+	getE("vissc").innerHTML = l;
+	getE("visrc").style.display=ve.style.display=f;
 }
 
 function repcl() {
@@ -464,6 +493,8 @@ function init() {
 	<audio controls="controls" id="pctl"></audio>
 </div>
 <canvas id="vis" onClick="g_v['c']();"></canvas>
+<span style="display:none;" id="visupd"><span id="vissc" class="btn" onclick="visedit()"></span><span id="visrc" class="btn" onclick="visrc()">save code</span></span>
+<textarea id="visedit"></textarea>
 <div id="lib">
 	<div id="lcont">
 		<div class="tbar">search: <input id="fbox" type="text" size=40 onkeyup="onF();"/>
