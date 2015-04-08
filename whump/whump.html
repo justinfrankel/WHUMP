@@ -112,8 +112,10 @@ fntourl = function(s) { return s.replace(/#/g,"%23"); },
 g_ls_pre="l_",
 g_pl_ipp=" - default playlist",
 g_viscode = 
+'var dl = 1024, b = new Uint8Array(dl);'+
+'a.fftSize=dl;'+
 'return { f: function() {' +
-'	var dl=a.fftSize, xsc=v.width/dl, ch=v.height,x,ctx=v.getContext("2d");'+
+'	var xsc=v.width/dl, ch=v.height,x,ctx=v.getContext("2d");'+
 '	ctx.fillStyle="#000";'+
 '	ctx.globalAlpha=0.25;'+
 '	ctx.fillRect(0,0,v.width,v.height);'+
@@ -134,7 +136,7 @@ Z=null,
 g_filt_t=Z, g_play=Z, g_res=Z,
 g_db=[], g_db_lens=[],
 g_pl=[], g_pl_x=0, g_rep=2,
-g_v=Z, g_va=Z, g_vb=Z,
+g_v=Z, g_va=Z,
 g_pln="",
 getE=function(f){return document.getElementById(f)};
 
@@ -345,7 +347,6 @@ function visb() {
 		if (ac) {
 			var c = new ac, s = c.createMediaElementSource(g_play);
 			g_va=c.createAnalyser();
-			g_vb = new Uint8Array(g_va.fftSize = 1024)
 			s.connect(g_va);
 			g_va.connect(c.destination);
 		}
@@ -356,7 +357,7 @@ function visb() {
 		getE("visb").innerHTML = "vis";
 		g_v=Z;
 	} else {
-		g_v=(new Function("a","b","v",g_viscode))(g_va,g_vb,getE("vis"));
+		g_v=(new Function("a","v",g_viscode))(g_va,getE("vis"));
 		if (g_v) {
 			getE("vis").style.display="inline";
 			getE("lib").style.display="none";
