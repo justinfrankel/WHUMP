@@ -120,22 +120,22 @@ fntourl = function(s) { return s.replace(/#/g,"%23"); },
 g_ls_pre="l_",
 g_pl_ipp=" - default playlist",
 g_viscode = 
-'var dl = 1024, b = new Uint8Array(dl);\n'+
-'a.fftSize=dl;\n'+
+'var l=1024, b=new Uint8Array(l);\n'+
+'a.fftSize=l;\n'+
 'return { f: function() {\n' +
-'	var xsc=v.width/dl, ch=v.height,x,ctx=v.getContext("2d");\n'+
-'	ctx.fillStyle="#000";\n'+
-'	ctx.globalAlpha=0.25;\n'+
-'	ctx.fillRect(0,0,v.width,v.height);\n'+
-'	ctx.strokeStyle="#8f8";\n'+
-'	ctx.globalAlpha=1;\n'+
-'	ctx.beginPath();\n'+
+'	var x=0,w=v.width,h=v.height,c=v.getContext("2d");\n'+
+'	c.fillStyle="#000";\n'+
+'	c.globalAlpha=0.25;\n'+
+'	c.fillRect(0,0,w,h);\n'+
+'	c.strokeStyle="#8f8";\n'+
+'	c.globalAlpha=1;\n'+
+'	c.beginPath();\n'+
 '	a.getByteTimeDomainData(b);\n'+
-'	for (x = 0; x < dl; x ++) {\n'+
-'		var y = ch*0.5 * (1.0 + (b[x]-0x80)*0.0078125);\n'+
-'		x ? ctx.lineTo(x*xsc,y) : ctx.moveTo(0,y);\n'+
+'	for (;x<l;x++) {\n'+
+'		var y = h*0.5 * (1.0 + (b[x]-0x80)*0.0078125);\n'+
+'		x ? c.lineTo(x*w/l,y) : c.moveTo(0,y);\n'+
 '	}\n'+
-'	ctx.stroke();\n'+
+'	c.stroke();\n'+
 '}, c: function() { /*onclick*/ }, \n'+
 '}\n',
 
@@ -243,8 +243,8 @@ function vLoad() {
 	g_vn=p;
 	p = window.localStorage.getItem("vp_" + p);
 	if (p!==Z && p !="") {
-		vRc(p);
 		getE('visedit').value=p;
+		vRc();
 	}
 }
 
@@ -365,10 +365,15 @@ function pAll(c,q) {
 }
 
 function rv() {
-	if (g_v) {
-		g_v['f']();
-		window.requestAnimationFrame(rv);
-	}
+	if (g_v) { try { g_v['f'](); } catch(e) { g_v=Z; alert(e); }; };
+	g_v && window.requestAnimationFrame(rv);
+}
+
+function mkv() {
+	g_v=Z;
+	try {
+		g_v=(new Function("a","v",g_viscode))(g_va,getE("vis"));
+	} catch(e) { alert(e); };
 }
 
 function visb() {
@@ -388,7 +393,7 @@ function visb() {
 		v.style.display=ve.style.display= vu.style.display="none";
 		g_v=Z;
 	} else {
-		g_v=(new Function("a","v",g_viscode))(g_va,getE("vis"));
+		mkv();
 		if (g_v) {
 			vb.innerHTML = "lib";
 			v.style.display=vu.style.display="inline";
@@ -400,10 +405,11 @@ function visb() {
 	getE("visrc").style.display="none";
 }
 
-function vRc(a) { 
+function vRc() { 
 	var o=g_v;
-	g_v=(new Function("a","v",g_viscode = a))(g_va,getE("vis"));
-	if (!o) rv();
+	g_viscode = getE("visedit").value;
+	mkv();
+	o || rv();
 }
 
 function visedit() {
@@ -411,7 +417,6 @@ function visedit() {
 	if (ve.style.display != "inline") {
 		f="inline";
 		l="hide code";
-		ve.value = g_viscode;
 	}
 	getE("vissc").innerHTML = l;
 	getE("visrc").style.display=ve.style.display=f;
@@ -496,6 +501,8 @@ function init() {
 	}, 100);
 
 	whump_init();
+
+	getE("visedit").value = g_viscode;
 }
 
 </script>
@@ -517,7 +524,7 @@ function init() {
 <span style="display:none;" id="visupd">
 	<span id="vissc" class="btn" onclick="visedit()"></span>
 	<span id="visrc">
-		<span class="btn" onclick="vRc(getE('visedit').value);">save code</span>
+		<span class="btn" onclick="vRc();">save code</span>
 		<span class="btn" onclick="vSave()">save preset</span>
 	</span>
 	<span class="btn" onclick="vLoad()">load preset</span>
