@@ -248,6 +248,14 @@ function vLoad() {
 	}
 }
 
+function vOnk(e) {
+	if (e.ctrlKey && String.fromCharCode(e.which) == 'S') {
+		vRc();
+		return false;
+	}
+	return true;
+}
+
 function plSave() {
 	g_pln = lSave("Save playlist?",g_ls_pre,g_pl.length ? g_pl.join("\t"):Z,g_pln);
 }
@@ -529,7 +537,7 @@ function init() {
 	</span>
 	<span class="btn" onclick="vLoad()">load preset</span>
 </span>
-<textarea spellcheck="false" id="visedit"></textarea>
+<textarea spellcheck="false" id="visedit" onkeydown="return vOnk(event)"></textarea>
 <div id="lib">
 	<div id="lcont">
 		<div class="tbar">search: <input id="fbox" type="text" size=40 onkeyup="onF();"/>
