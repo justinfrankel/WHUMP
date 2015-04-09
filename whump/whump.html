@@ -120,23 +120,25 @@ fntourl = function(s) { return s.replace(/#/g,"%23"); },
 g_ls_pre="l_",
 g_pl_ipp=" - default playlist",
 g_viscode = 
-'var l=1024, b=new Uint8Array(l);\n'+
+'var l=1024, b=new Uint8Array(l),m=0;\n'+
 'a.fftSize=l;\n'+
 'return { f: function() {\n' +
-'	var x=0,w=v.width,h=v.height,c=v.getContext("2d");\n'+
+'	var x=0,w=v.width,h=v.height,c=v.getContext("2d"),n=m?l/2:l;\n'+
 '	c.fillStyle="#000";\n'+
 '	c.globalAlpha=0.25;\n'+
 '	c.fillRect(0,0,w,h);\n'+
 '	c.strokeStyle="#8f8";\n'+
 '	c.globalAlpha=1;\n'+
 '	c.beginPath();\n'+
-'	a.getByteTimeDomainData(b);\n'+
-'	for (;x<l;x++) {\n'+
-'		var y = h*0.5 * (1.0 + (b[x]-0x80)*0.0078125);\n'+
-'		x ? c.lineTo(x*w/l,y) : c.moveTo(0,y);\n'+
+'	m?a.getByteFrequencyData(b):a.getByteTimeDomainData(b);\n'+
+'	for (;x<n;x++) {\n'+
+'		var y = 0.5 + (b[x]-0x80)*0.0039;\n'+
+'		if (m) y = -Math.log(y)*h*0.66;\n'+
+'		else y*=h;\n'+
+'		x ? c.lineTo(x*w/n,y) : c.moveTo(0,y);\n'+
 '	}\n'+
 '	c.stroke();\n'+
-'}, c: function() { /*onclick*/ }, \n'+
+'}, c: function() { m^=1; }, \n'+
 '}\n',
 
 W=window,
