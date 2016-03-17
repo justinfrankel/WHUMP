@@ -143,7 +143,7 @@ g_viscode =
 
 W=window,
 Z=null,
-g_filt_t=Z, g_play=Z, g_res=Z,
+g_filt_t=Z, g_play=Z, g_res=Z, g_gr_t=Z,
 g_db=[], g_pl=[], g_pl_x=0, g_rep=2,
 g_v=Z, g_va=Z, g_vn="",
 g_pln="",
@@ -336,12 +336,17 @@ function mkt(r) {
 	return o;
 }
 
-function dbFlt(cb,q) {
-	var n,x, f=mkt((q===Z?getE("fbox").value:q).toLowerCase().split(" "));
-	for (x in g_db) {
+function dbFlt(cb,q, x,l, maxout) {
+	var n, f=mkt((q===Z?getE("fbox").value:q).toLowerCase().split(" "));
+	while (x < l) {
                 n = g_db[x][1];
-		if (!f.length || hasS(n.toLowerCase(),f)) cb(n,x);
+		if (!f.length || hasS(n.toLowerCase(),f)) {
+			cb(n,x);
+			if (--maxout == 0) return x+1;
+		}
+		x++;
 	}
+	return x;
 }
 
 function rnMk(x, lb) {
@@ -354,22 +359,30 @@ function rnCfg(n, x) {
 }
 
 function genRes() {
-	var c=0, n=g_res.childNodes, dl = n.length;
-        dbFlt(function(nm, x) {
-		var lb = nm + " <i>" + fmtLen(x) + "</i>", a, d;
-		if (c < dl) {
-			d = n[c++];
-			a = d.childNodes;
-			if (a.length == 5) a[4].innerHTML = lb;
-			else d.innerHTML=rnMk(x,lb);
-		} else d = mkDiv(g_res,rnMk(x,lb));
-		rnCfg(d,x);
-        },Z);
-	while (dl > c) g_res.removeChild(n[--dl]);
+	var pos=0, c=0, n=g_res.childNodes, dl = n.length, dbl = g_db.length;
+	if (g_gr_t !== Z) W.clearInterval(g_gr_t);
+
+        g_gr_t = W.setInterval(function() { 
+        	pos = dbFlt(function(nm, x) {
+  			var lb = nm + " <i>" + fmtLen(x) + "</i>", a, d;
+  			if (c < dl) {
+				d = n[c++];
+				a = d.childNodes;
+				if (a.length == 5) a[4].innerHTML = lb;
+				else d.innerHTML=rnMk(x,lb);
+			} else d = mkDiv(g_res,rnMk(x,lb));
+			rnCfg(d,x);
+        	},Z,pos,dbl,50);
+		if (pos >= dbl) {
+			W.clearInterval(g_gr_t);
+			g_gr_t = Z;
+			while (dl > c) g_res.removeChild(n[--dl]);
+		}
+	},100);
 }
 
 function pAll(c,q) {
-        dbFlt(function(n, x) { nq(x,!c++,0); },q);
+        dbFlt(function(n, x) { nq(x,!c++,0); },q,0,g_db.length,-1);
 	plUpd();
 }
 
