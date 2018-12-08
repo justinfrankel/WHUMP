@@ -506,6 +506,14 @@ function impD(text) {
 		}
 		visb();
 	}
+	else if ((x=h.replace(/^#q=(.*)$/,"$1")) != h) {
+		if (x == "") seek(0);
+		else {
+			plClr();
+			pAll(1,decodeURIComponent(x));
+		}
+		getE("fbox").value = x;
+	}
 }
 
 function init() {
