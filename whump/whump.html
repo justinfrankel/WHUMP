@@ -491,7 +491,7 @@ function impD(text) {
 				if (g_pl_ipp!="") g_pl.push(s[1]);
 			}
 			else if (s[0] == "item") {
-				g_db.push([s[1],db_fntitle(s[1]), s.length > 2 ? s[2] : 0]);
+				g_db.push([s[1],s.length>3 ? s[3] : db_fntitle(s[1]), s.length > 2 ? s[2] : 0]);
 			}
 		}
 	}
