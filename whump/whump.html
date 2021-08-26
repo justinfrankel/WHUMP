@@ -467,7 +467,7 @@ if (!r && W.createRequest) { try { r = W.createRequest(); } catch (e) { r=0; } }
 		g_res.innerHTML = "<div><i>error, no xml http support</i></div>";
 		return;
 	}
-	r.open("GET", list, true);
+	r.open("GET", list+'?dc='+(new Date()).getTime(), true);
 	r.onreadystatechange = function() {
 		if (r.readyState == 4) {
 			if (r.status == 200) {
