@@ -146,7 +146,7 @@ Z=null,
 g_filt_t=Z, g_play=Z, g_res=Z, g_gr_t=Z,
 g_db=[], g_pl=[], g_pl_x=0, g_rep=2,
 g_v=Z, g_va=Z, g_vn="",
-g_pln="",
+g_pln="", g_origt=null,
 getE=function(f){return document.getElementById(f)};
 
 function hasS(f, l) {
@@ -166,7 +166,10 @@ function hasS(f, l) {
 }
 
 function pPi(i,f) {
-	g_play.src = fntourl(g_pl[g_pl_x=i]);
+	if (g_origt==null) g_origt=document.title;
+	var url = fntourl(g_pl[g_pl_x=i]);
+	g_play.src = url;
+        document.title = url.split("/").pop().replace(/[.]mp3$/,'') + " - " + g_origt;
 	g_play.load();
 	f && g_play.play();
 	updNowp();
