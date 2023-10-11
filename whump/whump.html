@@ -95,6 +95,7 @@
 #pl a {
 	color: #3f3;
 	font-weight: normal;
+	text-decoration: none;
 }
 #vis {
 	width: 100%;
@@ -115,7 +116,7 @@
 
 var
 db_fntitle = function(s) {  return s.replace( /(.*)[.][a-zA-Z0-9]+?$/,"$1"); },
-pl_fntitle = function(s) { return s.replace(/(.*[/])?(.*)[.][a-zA-Z0-9]+?$/, "$2"); },
+pl_fntitle = function(s) { return decodeURIComponent(s.replace(/(.*[/])?(.*)[.][a-zA-Z0-9]+?$/, "$2")).replace(/_/g," "); },
 fntourl = function(s) { return s.replace(/#/g,"%23"); },
 g_ls_pre="l_",
 g_pl_ipp=" - default playlist",
